@@ -27,7 +27,7 @@ int readlog();
 
 FILE *logfile;
 struct sockaddr_in source,dest;
-int tcp=0,udp=0,others=0,total=0,i,j;
+int tcp,udp,others,i,j;
 
 GtkWidget *g_lbl_tcp;
 GtkWidget *g_lbl_udp;
@@ -75,6 +75,9 @@ int main(int argc, char *argv[])
 
 void on_btn_start_clicked()
 {
+  tcp=0;
+  udp=0;
+  others=0;
   sniff();
 }
 
@@ -91,14 +94,12 @@ int sniff(){
   total_packets = atoi(var_total);
 
   unsigned char *buffer = (unsigned char *) malloc(65536); //Alokasi memori
-  printf("\n%d\n",total_packets);
 
   logfile=fopen("log.txt","w");
   if(logfile==NULL)
   {
-      printf("Tidak bisa memuat file log.txt");
+    gtk_text_buffer_set_text(buffertext, "Tidak bisa memuat file log.txt, file log akan dibuat secara otomatis", -1);
   }
-  printf("Mulai...\n");
 
   int sock_raw = socket( AF_PACKET , SOCK_RAW , htons(ETH_P_ALL)) ;
 
@@ -115,7 +116,7 @@ int sniff(){
       data_size = recvfrom(sock_raw , buffer , 65536 , 0 , &saddr , (socklen_t*)&saddr_size);
       if(data_size <0 )
       {
-          printf("Recvfrom error , gagal mendapatkan packets\n");
+          gtk_text_buffer_set_text(buffertext, "Recvfrom error , gagal mendapatkan packets\n", -1);
           return 1;
       }
       //Memproses Paket
@@ -139,7 +140,6 @@ int sniff(){
 void ProcessPacket(unsigned char* buffer, int size)
 {
     struct iphdr *iph = (struct iphdr*)(buffer + sizeof(struct ethhdr));
-    ++total;
     switch (iph->protocol)
     {
         case 6:  //TCP Protocol
@@ -337,7 +337,8 @@ int readlog(){
 
   logfile = fopen("log.txt", "r");
   if (logfile == NULL) {
-    perror ("Gagal membuka file log. . .");
+    gtk_text_buffer_set_text(buffertext,"Gagal membuka file log. . .\nSilahkan cek console untuk melihat error log", -1);
+    perror("Error! - ");
     return 1;
   }
   gtk_text_buffer_set_text(buffertext, " ", -1);
