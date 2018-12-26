@@ -21,6 +21,10 @@ V 1.0
 - menload log langsung di aplikasi tanpa perlu membuka file txt
 - counter jumlah packet yang berhasil dicapture
 
+V 1.1
+
+- Menampilkan warning jika tombol load log file diklik namun file log.txt tidak tersedia
+
 *******************
 Requirements
 *******************
